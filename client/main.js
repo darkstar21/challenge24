@@ -1,0 +1,1 @@
+new AppView(model: new AppModel()).$el.appendTo('body');
