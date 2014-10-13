@@ -7,6 +7,14 @@ var NumberModel = Backbone.Model.extend({
   dequeue: function(){
     // Triggering an event here will also trigger the event on the collection
     this.trigger('dequeue', this);
+  },
+
+  getValue: function(){
+    return this.get('value');
+  },
+
+  getText: function(){
+    return this.get('display');
   }
 
 });

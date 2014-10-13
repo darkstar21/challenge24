@@ -2,7 +2,16 @@ var AppView = Backbone.View.extend({
 
   template: _.template('<div class="number-queue"></div>\
     <div class="compute-area"></div>\
-    <button class="hit-button">Submit</button> <button class="stand-button">Clear</button>'),
+    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button>'),
+
+  events: {
+    'click .submit-button': function() {
+      this.model.compute();
+    },
+    'click .clear-button': function() {
+      this.model.clearComputeArea();
+    },
+  },
 
   initialize: function(params){
     this.holderView = new NumberQueueView({collection: this.model.get('numQueue')});

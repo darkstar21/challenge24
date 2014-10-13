@@ -4,5 +4,13 @@ var NumberQueue = Numbers.extend({
       var number = Math.floor(Math.random()*13+1)
       this.add(new NumberModel({value: number, display: ""+number}));
     }
+
+    this.on('add', function(number){
+      if(this.length === 1){
+        if(number.value === 24){
+          this.trigger('win');
+        }
+      }
+    }, this);
   }
 });
