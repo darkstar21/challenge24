@@ -7,8 +7,9 @@ var NumberQueue = Numbers.extend({
 
     this.on('add', function(number){
       if(this.length === 1){
-        if(number.value === 24){
+        if(number.getValue() === 24){
           this.trigger('win');
+          console.log("You won");
         }
       }
     }, this);

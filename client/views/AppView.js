@@ -2,6 +2,7 @@ var AppView = Backbone.View.extend({
 
   template: _.template('<div class="number-queue"></div>\
     <div class="compute-area"></div>\
+    <div class="operation-box"></div>\
     <button class="submit-button">Submit</button> <button class="clear-button">Clear</button>'),
 
   events: {
@@ -16,6 +17,7 @@ var AppView = Backbone.View.extend({
   initialize: function(params){
     this.holderView = new NumberQueueView({collection: this.model.get('numQueue')});
     this.computeView = new ComputeView({collection: this.model.get('computeQueue')});
+    this.operationView = new OperationView({model: this.model.get('operation')});
 
     this.model.on('change:numQueue', function(model){
       this.render();
@@ -33,6 +35,7 @@ var AppView = Backbone.View.extend({
     this.$el.html(this.template);
     this.$('.number-queue').html(this.holderView.el);
     this.$('.compute-area').html(this.computeView.el);
+    this.$('.operation-box').html(this.operationView.el);
   }
 
 });

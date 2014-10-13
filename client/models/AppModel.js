@@ -5,6 +5,7 @@ var AppModel = Backbone.Model.extend({
     this.set('computeQueue', new ComputeQueue());
     this.set('operation', new OperationModel());
 
+    //Moving number from queue to computation. Only allowed if computation has 0 or 1 numbers
     this.get('numQueue').on('dequeue', function(number){
       if(this.get('computeQueue').length < 2){
         this.get('numQueue').remove(number);
@@ -12,6 +13,7 @@ var AppModel = Backbone.Model.extend({
       }
     }, this);
 
+    //Moving number from computation to queue. Always allowed.
     this.get('computeQueue').on('dequeue', function(number){
       this.get('computeQueue').remove(number);
       this.get('numQueue').add(number);
@@ -19,14 +21,12 @@ var AppModel = Backbone.Model.extend({
 
   },
 
+  //Compute new number only if there are 2 numbers in computation area
   compute: function(){
     if(this.get('computeQueue').length === 2){
-      console.log("in here");
       var one = this.get('computeQueue').at(0).getValue();
       var two = this.get('computeQueue').at(1).getValue();
       var operation = this.get('operation').getValue();
-      console.log("ONE " + JSON.stringify(one));
-      console.log("TWO " + two);
       var result, text;
       if(operation === '+'){
         result = one+two;
@@ -52,11 +52,12 @@ var AppModel = Backbone.Model.extend({
     }
   },
 
+  //Clear out computation area, move numbers back to queue
   clearComputeArea: function(){
-    var system = this;
+    //var system = this;
     this.get('computeQueue').each(function(number){
-      system.get('numQueue').add(number);
-    });
+      this.get('numQueue').add(number);
+    }, this);
     this.get('computeQueue').reset();
   }
 
