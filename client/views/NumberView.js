@@ -2,7 +2,7 @@ var NumberView = Backbone.View.extend({
 
   className: 'number',
 
-  template: _.template('(<%= display %>)'),
+  template: _.template('<span><%= display %></span>'),
 
   initialize: function(){
     this.model.on('change', function(){
