@@ -1,7 +1,7 @@
 var NumberModel = Backbone.Model.extend({
-  initialize: function(value, display) {
-    this.set('value', value);
-    this.set('display', display);
+  initialize: function(params) {
+    this.set('value', params.value);
+    this.set('display', params.display);
   },
 
   dequeue: function(){
