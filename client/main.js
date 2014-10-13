@@ -1,1 +1,2 @@
-new AppView(model: new AppModel()).$el.appendTo('body');
+var view = new AppView(model: new AppModel())
+view.$el.appendTo('body');

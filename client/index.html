@@ -1,24 +1,23 @@
 <html>
   <head>
-    <title>Blackjack</title>
+    <title>Challenge 24</title>
     <link href="styles/app.css" rel="stylesheet" type="text/css" media="screen">
   </head>
   <body>
-    <script src="lib/jquery.js"></script>
-    <script src="lib/underscore.js"></script>
-    <script src="lib/backbone.js"></script>
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
 
-    <script src="compiled/client/models/Card.js"></script>
-    <script src="compiled/client/collections/Hand.js"></script>
-    <script src="compiled/client/collections/Deck.js"></script>
-    <script src="compiled/client/collections/History.js"></script>
-    <script src="compiled/client/models/App.js"></script>
-    <script src="compiled/client/models/Round.js"></script>
+    <script src="models/NumberModel.js"></script>
+    <script src="models/AppModel.js"></script>
 
-    <script src="compiled/client/views/CardView.js"></script>
-    <script src="compiled/client/views/HandView.js"></script>
-    <script src="compiled/client/views/AppView.js"></script>
+    <script src="collections/Numbers.js"></script>
+    <script src="collections/NumberQueue.js"></script>
+    <script src="collections/ComputeQueue.js"></script>
 
-    <script src="compiled/client/main.js"></script>
+    <script src="views/NumberView.js"></script>
+    <script src="views/AppView.js"></script>
+
+    <script src="main.js"></script>
   </body>
 </html>
