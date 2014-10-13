@@ -4,10 +4,5 @@ var NumberQueue = Numbers.extend({
       var number = Math.floor(Math.random()*13+1)
       this.add(new NumberModel({value: number, display: ""+number}));
     }
-    this.on('dequeue', function(number) {
-      if(this.length > 1){
-        this.remove(number)
-      }
-    });
   }
 });
