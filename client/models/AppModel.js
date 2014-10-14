@@ -27,7 +27,7 @@ var AppModel = Backbone.Model.extend({
     this.get('numQueue').on('win', function(){
       alert("You won! Your time was " + this.get('timer') + " seconds");
       clearInterval(myVar);
-      document.getElementById("demo").innerHTML = 'Timer: '
+      // document.getElementById("demo").innerHTML = 'Timer: '
       var view = new AppView({model: new AppModel()});
       $('.board').html('');
       view.$el.appendTo($('.board'));
@@ -48,7 +48,7 @@ var AppModel = Backbone.Model.extend({
       if(diff % 1 > 0.5){
         diff -= 0.5
       }
-      document.getElementById("demo").innerHTML = 'Timer: ' + Math.floor(diff);
+      document.getElementById("timer").innerHTML = 'Timer: ' + Math.floor(diff);
       return Math.floor(diff);
     }
 
@@ -59,7 +59,6 @@ var AppModel = Backbone.Model.extend({
     this.set('startingNums', []);
     this.set('hint', '');
     var numArray = this.generateValidNums();
-    console.log(this.get('hint'));
     for(var i = 0; i < numArray.length; i++){
       this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
     }
@@ -73,7 +72,7 @@ var AppModel = Backbone.Model.extend({
 
   //Compute new number only if there are 2 numbers in computation area
   compute: function(){
-    if(this.get('computeQueue').length === 2){
+    if(this.get('computeQueue').at(1).getValue()){
       var one = this.get('computeQueue').at(0).getValue();
       var two = this.get('computeQueue').at(1).getValue();
       var operation = this.get('operation').getValue();
@@ -183,7 +182,7 @@ var AppModel = Backbone.Model.extend({
                 possible = true;
                 return;
               } else if(operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), operators[thirdOp](currentNums[2], currentNums[3])) === 24){
-                that.set('hint', '? ' + secondOp + ' ? = 24');
+                that.set('hint', '' + operators[firstOp](currentNums[0], currentNums[1]) + ' ' + secondOp + ' ? = 24');
                 possible = true;
                 return;
               } else if(operators[firstOp](currentNums[0], operators[thirdOp](operators[secondOp](currentNums[1], currentNums[2]), currentNums[3])) === 24){

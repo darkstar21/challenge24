@@ -8,14 +8,15 @@ var AppView = Backbone.View.extend({
     <div class="computeTwo-area"></div>\
     <div class="equals">=</div>\
     <div class="answer-area"></div>\
-    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button>'),
+    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button><div id="timer">Timer: </div>\
+    <div class="hint-area"></div>'),
 
   events: {
     'click .reset-button': function(){
       this.model.reset();
     },
-    'click .help-button': function(){
-
+    'click .hint-button': function(){
+      this.$('.hint-area').html('Hint: ' + this.model.get('hint'));
     },
     'click .submit-button': function() {
       this.model.compute();
@@ -52,6 +53,7 @@ var AppView = Backbone.View.extend({
     this.$('.computeOne-area').html(this.oneComputeView.render());
     this.$('.operation-box').html(this.operationView.el);
     this.$('.computeTwo-area').html(this.twoComputeView.render());
+    this.$('#timer').html('Timer: ' + this.model.get('timer'));
     if(this.model.get('computeQueue').at(1).getValue()){
       var one = this.model.get('computeQueue').at(0).getValue();
       var two = this.model.get('computeQueue').at(1).getValue();
