@@ -1,7 +1,7 @@
 {
-  "name": "shortly-express",
+  "name": "challenge24",
   "version": "0.0.1",
-  "description": "shortly using express",
+  "description": "get to 24",
   "main": "server.js",
   "repository": "",
   "license": "Proprietary",
