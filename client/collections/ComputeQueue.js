@@ -5,5 +5,6 @@ var ComputeQueue = Numbers.extend({
         this.remove(number)
       }
     });
+
   }
 });
