@@ -1,6 +1,6 @@
 var AppView = Backbone.View.extend({
 
-  template: _.template('<button class="reset-button">Reset</button>\
+  template: _.template('<button class="reset-button">Reset</button> <button class="hint-button">Hint</button>\
     <div class="number-queue"></div>\
     <h3>Computation Area</h3>\
     <div class="computeOne-area"></div>\
@@ -13,6 +13,9 @@ var AppView = Backbone.View.extend({
   events: {
     'click .reset-button': function(){
       this.model.reset();
+    },
+    'click .help-button': function(){
+
     },
     'click .submit-button': function() {
       this.model.compute();

@@ -54,6 +54,15 @@
   font-size: 100%;
 }
 
+.reset-button {
+  font-size: 100%;
+  margin-right: 20px;
+}
+
+.hint-button {
+  font-size: 100%;
+}
+
 .answer-area {
   float: left;
   border: solid 1px black;
