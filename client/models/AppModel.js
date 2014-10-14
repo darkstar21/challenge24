@@ -57,7 +57,9 @@ var AppModel = Backbone.Model.extend({
   //Fill in initial values for a new game
   resetApp: function(){
     this.set('startingNums', []);
+    this.set('hint', '');
     var numArray = this.generateValidNums();
+    console.log(this.get('hint'));
     for(var i = 0; i < numArray.length; i++){
       this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
     }
@@ -160,6 +162,8 @@ var AppModel = Backbone.Model.extend({
       }
     };
 
+    var that = this;
+
     var recurse = function(currentNums, remainingNums){
       if(remainingNums.length === 0){
         //have unique order of numbers, loop through each operator in the three positions
@@ -170,11 +174,24 @@ var AppModel = Backbone.Model.extend({
             secondOp = opString(j);
             for(var k = 0; k < 4; k++){
               thirdOp = opString(k);
-              if(operators[thirdOp](operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), currentNums[2]), currentNums[3]) === 24 ||
-              operators[thirdOp](operators[firstOp](currentNums[0], operators[secondOp](currentNums[1], currentNums[2])), currentNums[3]) === 24 ||
-              operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), operators[thirdOp](currentNums[2], currentNums[3])) === 24 ||
-              operators[firstOp](currentNums[0], operators[thirdOp](operators[secondOp](currentNums[1], currentNums[2]), currentNums[3])) === 24 ||
-              operators[firstOp](currentNums[0], operators[secondOp](currentNums[1], operators[thirdOp](currentNums[2], currentNums[3]))) === 24){
+              if(operators[thirdOp](operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), currentNums[2]), currentNums[3]) === 24){
+                that.set('hint', '? ' + thirdOp + ' ' + currentNums[3] + ' = 24');
+                possible = true;
+                return;
+              } else if (operators[thirdOp](operators[firstOp](currentNums[0], operators[secondOp](currentNums[1], currentNums[2])), currentNums[3]) === 24){
+                that.set('hint', '? ' + thirdOp + ' ' + currentNums[3] + ' = 24');
+                possible = true;
+                return;
+              } else if(operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), operators[thirdOp](currentNums[2], currentNums[3])) === 24){
+                that.set('hint', '? ' + secondOp + ' ? = 24');
+                possible = true;
+                return;
+              } else if(operators[firstOp](currentNums[0], operators[thirdOp](operators[secondOp](currentNums[1], currentNums[2]), currentNums[3])) === 24){
+                that.set('hint', currentNums[0] + ' ' + firstOp + ' ? = 24');
+                possible = true;
+                return;
+              } else if(operators[firstOp](currentNums[0], operators[secondOp](currentNums[1], operators[thirdOp](currentNums[2], currentNums[3]))) === 24){
+                that.set('hint', currentNums[0] + ' ' + firstOp + ' ? = 24');
                 possible = true;
                 return;
               }       
