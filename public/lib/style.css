@@ -64,6 +64,11 @@
   font-size: 100%;
 }
 
+.logout {
+  margin-left: 400px;
+  font-size: 150%;
+}
+
 .answer-area {
   float: left;
   border: solid 1px black;
@@ -78,6 +83,7 @@
 
 .hint-area {
   font-size: 200%;
+  margin-top: 20px;
 }
 
 form {

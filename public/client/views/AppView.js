@@ -1,6 +1,7 @@
 var AppView = Backbone.View.extend({
 
   template: _.template('<button class="reset-button">Reset</button> <button class="hint-button">Hint</button>\
+    <a href="/logout" class="logout">Logout</a>\
     <div class="number-queue"></div>\
     <h3>Computation Area</h3>\
     <div class="computeOne-area"></div>\
