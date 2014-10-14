@@ -4,7 +4,11 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       dist: {
-        src: ['public/client/**/*.js'],
+        src: ['public/client/fraction.js','public/client/models/NumberModel.js', 'public/client/models/OperationModel.js',
+        'public/client/models/AppModel.js','public/client/collections/Numbers.js', 'public/client/collections/NumberQueue.js',
+        'public/client/collections/ComputeQueue.js','public/client/views/NumberView.js', 'public/client/views/OperationView.js',
+        'public/client/views/NumberQueueView.js', 'public/client/views/ComputeView.js', 'public/client/views/AppView.js',
+        'public/client/main.js'],
         dest: 'public/dist/built.js',
       },
     },
@@ -45,7 +49,7 @@ module.exports = function(grunt) {
       my_target: {
         files: [{
           expand: true,
-          cwd: 'public',
+          cwd: 'public/lib',
           src: ['*.css', '!*.min.css'],
           dest: 'public/dist/',
           ext: '.min.css'
@@ -111,10 +115,6 @@ module.exports = function(grunt) {
   ////////////////////////////////////////////////////
   // Main grunt tasks
   ////////////////////////////////////////////////////
-
-  grunt.registerTask('test', [
-    'mochaTest'
-  ]);
 
   grunt.registerTask('build', [
     'concat',

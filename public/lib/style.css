@@ -23,6 +23,10 @@
   margin-top: 50px;
 }
 
+#timer {
+  font-size: 150%;
+}
+
 .equals {
   float: left;
   border: solid 1px black;
@@ -50,7 +54,7 @@
 
 .clear-button {
   display: block;
-  margin-top: 40px;
+  margin-top: 30px;
   margin-bottom: 20px;
   font-size: 100%;
 }
