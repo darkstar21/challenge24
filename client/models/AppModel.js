@@ -69,20 +69,18 @@ var AppModel = Backbone.Model.extend({
     var text, result;
     if(operation === '+'){
       result = one+two;
-      text = ""+result;
     } else if(operation === '-'){
       result = one-two;
-      text = ""+result;      
     } else if(operation === '*'){
       result = one*two;
-      text = ""+result;
     } else{
       result = one/two;
-      if(one % two !== 0){
-        text = "" + one + "/" + two;
-      } else{
-        text = result;
-      }
+    }
+    if(result % 1 !== 0){
+      var f = new Fraction(result);
+      text = f.numerator + '/' + f.denominator;
+    } else{
+      text = '' + result;
     }
     return [result, text];
   },
