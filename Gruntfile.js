@@ -75,7 +75,7 @@ module.exports = function(grunt) {
     },
     shell: {
       scaleSite: {
-        command: "azure site scale mode standard shortlyMH"
+        command: "azure site scale mode standard challenge24"
       },
       gitAdd: {
         command: "git add ."
@@ -87,7 +87,7 @@ module.exports = function(grunt) {
         command: "git push azure2 master"
       },
       downScaleSite: {
-        command:"azure site scale mode free shortlyMH"
+        command:"azure site scale mode free challenge24"
       }
     },
   });
