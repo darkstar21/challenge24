@@ -11,6 +11,10 @@ var NumberQueueView = Backbone.View.extend({
       this.render();
     }, this);
 
+    this.collection.on('reset', function(){
+      this.render();
+    }, this);
+
     this.render();
   },
 

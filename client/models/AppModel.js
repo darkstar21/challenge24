@@ -1,7 +1,12 @@
 var AppModel = Backbone.Model.extend({
 
   initialize: function(){
-    this.set('numQueue', new NumberQueue());
+    this.set('startingNums', []);
+    for(var i = 0; i < 4; i++){
+      var number = Math.floor(Math.random()*13+1);
+      this.get('startingNums').push(new NumberModel({value: number, display: ""+number}));
+    }
+    this.set('numQueue', new NumberQueue(this.get('startingNums')));
     this.set('computeQueue', new ComputeQueue());
     this.set('operation', new OperationModel());
 
@@ -54,10 +59,16 @@ var AppModel = Backbone.Model.extend({
 
   //Clear out computation area, move numbers back to queue
   clearComputeArea: function(){
-    //var system = this;
     this.get('computeQueue').each(function(number){
       this.get('numQueue').add(number);
     }, this);
+    this.get('computeQueue').reset();
+  },
+
+  //Clear computing area and set queue back to original numbers
+  reset: function(){
+    console.log('resetting');
+    this.get('numQueue').reset(this.get('startingNums'));
     this.get('computeQueue').reset();
   }
 
