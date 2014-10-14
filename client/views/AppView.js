@@ -2,6 +2,7 @@ var AppView = Backbone.View.extend({
 
   template: _.template('<button class="reset-button">Reset</button>\
     <div class="number-queue"></div>\
+    <h3>Computation Area</h3>\
     <div class="computeOne-area"></div>\
     <div class="operation-box"></div>\
     <div class="computeTwo-area"></div>\
@@ -24,10 +25,6 @@ var AppView = Backbone.View.extend({
     this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
     this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
     this.operationView = new OperationView({model: this.model.get('operation')});
-
-    this.model.on('all:numQueue', function(model){
-      this.render();
-    }, this);
 
     this.model.on('change:numComputingValues', function(model) {
       this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});

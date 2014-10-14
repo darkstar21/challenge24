@@ -20,6 +20,8 @@
   background-size: 100%;
   text-align: center;
   font-size: 250%;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .queue {
@@ -28,6 +30,5 @@
 }
 
 button {
-  
 }
 

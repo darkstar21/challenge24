@@ -1,15 +1,7 @@
 var AppModel = Backbone.Model.extend({
 
   initialize: function(){
-    this.set('startingNums', []);
-    var numArray = this.generateValidNums();
-    for(var i = 0; i < numArray.length; i++){
-      this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
-    }
-    this.set('numQueue', new NumberQueue(this.get('startingNums')));
-    this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
-    this.set('operation', new OperationModel());
-    this.set('numComputingValues', 0);
+    this.resetApp();
 
     //Moving number from queue to computation. Only allowed if computation has 0 or 1 numbers
     this.get('numQueue').on('dequeue', function(number){
@@ -32,6 +24,26 @@ var AppModel = Backbone.Model.extend({
       this.set('numComputingValues', this.get('numComputingValues')-1);
     }, this);
 
+    this.get('numQueue').on('win', function(){
+      alert("You won!");
+      var view = new AppView({model: new AppModel()});
+      $('.board').html('');
+      view.$el.appendTo($('.board'));
+    }, this);
+
+  },
+
+  //Fill in initial values for a new game
+  resetApp: function(){
+    this.set('startingNums', []);
+    var numArray = this.generateValidNums();
+    for(var i = 0; i < numArray.length; i++){
+      this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
+    }
+    this.set('numQueue', new NumberQueue(this.get('startingNums')));
+    this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
+    this.set('operation', new OperationModel());
+    this.set('numComputingValues', 0);
   },
 
   //Compute new number only if there are 2 numbers in computation area
@@ -62,7 +74,7 @@ var AppModel = Backbone.Model.extend({
       this.get('numQueue').add({value: result, display: text});
       this.set('numComputingValues', 0);
     } else{
-      console.log("Need two numbers to do a computation!")
+      alert("Need two numbers to do a computation!")
     }
   },
 

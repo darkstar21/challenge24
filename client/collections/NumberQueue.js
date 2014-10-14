@@ -5,7 +5,6 @@ var NumberQueue = Numbers.extend({
       if(this.length === 1){
         if(number.getValue() === 24){
           this.trigger('win');
-          console.log("You won");
         }
       }
     }, this);
