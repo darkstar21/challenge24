@@ -80,6 +80,18 @@
   font-size: 200%;
 }
 
+form {
+  margin: 10px;
+}
+
+form input[type=text], form input[type=password] {
+  width: 360px;
+  display: block;
+  font-size: 13px;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
 /*.board {
   position: fixed;
   top: 50%;
