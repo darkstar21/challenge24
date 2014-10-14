@@ -2,6 +2,7 @@ var AppView = Backbone.View.extend({
 
   template: _.template('<button class="reset-button">Reset</button> <button class="hint-button">Hint</button>\
     <a href="/logout" class="logout">Logout</a>\
+    <div class="average-time">Average Time: </div>\
     <div class="number-queue"></div>\
     <h3>Computation Area</h3>\
     <div class="computeOne-area"></div>\
@@ -63,6 +64,9 @@ var AppView = Backbone.View.extend({
       this.$('.answer-area').text(calc[1]);
     } else{
       this.$('.answer-area').text('');
+    }
+    if(this.model.get('averageTime') !== undefined && this.model.get('averageTime') !== ''){
+      this.$('.average-time').text('Average Time: ' + this.model.get('averageTime'));
     }
   }
 

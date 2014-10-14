@@ -5,7 +5,7 @@ var AppModel = Backbone.Model.extend({
 
     //Moving number from queue to computation. Only allowed if computation has 0 or 1 numbers
     this.get('numQueue').on('dequeue', function(number){
-      if(this.get('numComputingValues') < 2){  
+      if(this.get('numComputingValues') < 2){
         this.get('numQueue').remove(number);
         if(this.get('numComputingValues') === 0){
           this.get('computeQueue').reset([number, new NumberModel({})]);
@@ -27,10 +27,18 @@ var AppModel = Backbone.Model.extend({
     this.get('numQueue').on('win', function(){
       alert("You won! Your time was " + this.get('timer') + " seconds");
       clearInterval(myVar);
-      // document.getElementById("demo").innerHTML = 'Timer: '
-      var view = new AppView({model: new AppModel()});
-      $('.board').html('');
-      view.$el.appendTo($('.board'));
+      //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
+      $.ajax({
+        url: 'http://localhost:4568/recordTime',
+        type: 'POST',
+        data: {
+          time: this.get('timer')
+        }
+      }).done(function(){
+        var view = new AppView({model: new AppModel()});
+        $('.board').html('');
+        view.$el.appendTo($('.board'));
+      });
     }, this);
 
     this.get('operation').on('newValue', function(){
@@ -68,6 +76,14 @@ var AppModel = Backbone.Model.extend({
     this.set('numComputingValues', 0);
     this.set('timer', 0);
     this.set('startDate', new Date());
+    var that = this;
+    $.ajax({
+      url: 'http://localhost:4568/averageTime',
+      type: 'GET'
+    }).done(function(average){
+      that.set('averageTime', average);
+      that.trigger('update');
+    });
   },
 
   //Compute new number only if there are 2 numbers in computation area
@@ -193,7 +209,7 @@ var AppModel = Backbone.Model.extend({
                 that.set('hint', currentNums[0] + ' ' + firstOp + ' ? = 24');
                 possible = true;
                 return;
-              }       
+              }
             }
           }
         }

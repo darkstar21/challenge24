@@ -24,6 +24,9 @@ app.get('/logout', handler.logoutUser);
 app.get('/signup', handler.signupUserForm);
 app.post('/signup', handler.signupUser);
 
+app.post('/recordTime', handler.recordTime);
+app.get('/averageTime', handler.getAverageTime);
+
 // app.get('/*', handler.navToLink);
 
 module.exports = app;

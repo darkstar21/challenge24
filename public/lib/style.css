@@ -66,11 +66,17 @@
 
 .hint-button {
   font-size: 100%;
+  margin-right: 20px;
 }
 
 .logout {
-  margin-left: 400px;
+  margin-left: 300px;
   font-size: 150%;
+}
+
+.average-time {
+  font-size: 150%;
+  margin-top: 20px;
 }
 
 .answer-area {
