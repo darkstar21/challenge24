@@ -66,6 +66,13 @@
   font-size: 250%;
 }
 
+#diff {
+  display: block;
+  float: left;
+  font-size: 200%;
+  margin: 50px;
+}
+
 /*.board {
   position: fixed;
   top: 50%;

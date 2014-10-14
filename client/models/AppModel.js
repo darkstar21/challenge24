@@ -25,7 +25,9 @@ var AppModel = Backbone.Model.extend({
     }, this);
 
     this.get('numQueue').on('win', function(){
-      alert("You won!");
+      alert("You won! Your time was " + this.get('timer') + " seconds");
+      clearInterval(myVar);
+      document.getElementById("demo").innerHTML = 'Timer: '
       var view = new AppView({model: new AppModel()});
       $('.board').html('');
       view.$el.appendTo($('.board'));
@@ -34,6 +36,21 @@ var AppModel = Backbone.Model.extend({
     this.get('operation').on('newValue', function(){
       this.trigger('update');
     }, this);
+    var that = this;
+
+    var myVar = setInterval(function(){
+      that.set('timer', myTimer());
+    }, 1000);
+
+    var myTimer = function() {
+      var d = new Date();
+      var diff = (d-that.get('startDate'))/1000;
+      if(diff % 1 > 0.5){
+        diff -= 0.5
+      }
+      document.getElementById("demo").innerHTML = 'Timer: ' + Math.floor(diff);
+      return Math.floor(diff);
+    }
 
   },
 
@@ -48,6 +65,8 @@ var AppModel = Backbone.Model.extend({
     this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
     this.set('operation', new OperationModel());
     this.set('numComputingValues', 0);
+    this.set('timer', 0);
+    this.set('startDate', new Date());
   },
 
   //Compute new number only if there are 2 numbers in computation area
