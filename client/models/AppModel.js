@@ -2,9 +2,9 @@ var AppModel = Backbone.Model.extend({
 
   initialize: function(){
     this.set('startingNums', []);
-    for(var i = 0; i < 4; i++){
-      var number = Math.floor(Math.random()*13+1);
-      this.get('startingNums').push(new NumberModel({value: number, display: ""+number}));
+    var numArray = this.generateValidNums();
+    for(var i = 0; i < numArray.length; i++){
+      this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
     }
     this.set('numQueue', new NumberQueue(this.get('startingNums')));
     this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
@@ -15,12 +15,12 @@ var AppModel = Backbone.Model.extend({
     this.get('numQueue').on('dequeue', function(number){
       if(this.get('numComputingValues') < 2){  
         this.get('numQueue').remove(number);
-        this.set('numComputingValues', this.get('numComputingValues')+1);
-        if(this.get('numComputingValues') === 1){
+        if(this.get('numComputingValues') === 0){
           this.get('computeQueue').reset([number, new NumberModel({})]);
         } else {
           this.get('computeQueue').reset([this.get('computeQueue').at(0), number]);
         }
+        this.set('numComputingValues', this.get('numComputingValues')+1);
       }
     }, this);
 
@@ -82,6 +82,79 @@ var AppModel = Backbone.Model.extend({
     this.get('numQueue').reset(this.get('startingNums'));
     this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
     this.set('numComputingValues', 0);
+  },
+
+  generateValidNums: function(){
+    var numArray = [];
+    for(var i = 0; i < 4; i++){
+      numArray.push(Math.floor(Math.random()*13+1));
+    }
+    while(!this.isValid(numArray)){
+      numArray = [];
+      for(var i = 0; i < 4; i++){
+        numArray.push(Math.floor(Math.random()*13+1));
+      }
+    }
+    return numArray;
+  },
+
+  //Checks to see if the input numbers are valid
+  isValid: function(numArray){
+    var possible = false;
+
+    var operators = {
+      '+': function(a, b) { return a + b },
+      '-': function(a, b) { return a - b },
+      '*': function(a, b) { return a * b },
+      '/': function(a, b) { return a / b }
+    };
+
+    //Turns 0, 1, 2, 3 into +, -, *, /
+    var opString = function(num){
+      if(num === 0){
+        return '+';
+      } else if(num === 1){
+        return '-';
+      } else if(num === 2){
+        return '*';
+      } else{
+        return '/';
+      }
+    };
+
+    var recurse = function(currentNums, remainingNums){
+      if(remainingNums.length === 0){
+        //have unique order of numbers, loop through each operator in the three positions
+        var firstOp, secondOp, thirdOp;
+        for(var i = 0; i < 4; i++){
+          firstOp = opString(i);
+          for(var j = 0; j < 4; j++){
+            secondOp = opString(j);
+            for(var k = 0; k < 4; k++){
+              thirdOp = opString(k);
+              if(operators[thirdOp](operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), currentNums[2]), currentNums[3]) === 24 ||
+              operators[thirdOp](operators[firstOp](currentNums[0], operators[secondOp](currentNums[1], currentNums[2])), currentNums[3]) === 24 ||
+              operators[secondOp](operators[firstOp](currentNums[0], currentNums[1]), operators[thirdOp](currentNums[2], currentNums[3])) === 24 ||
+              operators[firstOp](currentNums[0], operators[thirdOp](operators[secondOp](currentNums[1], currentNums[2]), currentNums[3])) === 24 ||
+              operators[firstOp](currentNums[0], operators[secondOp](currentNums[1], operators[thirdOp](currentNums[2], currentNums[3]))) === 24){
+                possible = true;
+                return;
+              }       
+            }
+          }
+        }
+      } else{
+        for(var i = 0; i < remainingNums.length; i++){
+          var tempRemaining = remainingNums.slice(0);
+          var tempCurrent = currentNums.slice(0);
+          tempRemaining.splice(i,1);
+          tempCurrent.push(remainingNums[i]);
+          recurse(tempCurrent, tempRemaining);
+        }
+      }
+    }
+    recurse([], numArray);
+    return possible;
   }
 
 });

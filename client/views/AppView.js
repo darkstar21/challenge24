@@ -2,8 +2,9 @@ var AppView = Backbone.View.extend({
 
   template: _.template('<button class="reset-button">Reset</button>\
     <div class="number-queue"></div>\
-    <div class="compute-area"></div>\
+    <div class="computeOne-area"></div>\
     <div class="operation-box"></div>\
+    <div class="computeTwo-area"></div>\
     <button class="submit-button">Submit</button> <button class="clear-button">Clear</button>'),
 
   events: {
@@ -20,15 +21,17 @@ var AppView = Backbone.View.extend({
 
   initialize: function(params){
     this.holderView = new NumberQueueView({collection: this.model.get('numQueue')});
-    this.computeView = new ComputeView({collection: this.model.get('computeQueue')});
+    this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
+    this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
     this.operationView = new OperationView({model: this.model.get('operation')});
 
-    this.model.on('change:numQueue', function(model){
-      console.log('change to numQueue');
+    this.model.on('all:numQueue', function(model){
       this.render();
     }, this);
 
-    this.model.on('change:computeQueue', function(model) {
+    this.model.on('change:numComputingValues', function(model) {
+      this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
+      this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
       this.render();
     }, this);
 
@@ -39,8 +42,9 @@ var AppView = Backbone.View.extend({
     this.$el.children().detach();
     this.$el.html(this.template);
     this.$('.number-queue').html(this.holderView.el);
-    this.$('.compute-area').html(this.computeView.el);
+    this.$('.computeOne-area').html(this.oneComputeView.render());
     this.$('.operation-box').html(this.operationView.el);
+    this.$('.computeTwo-area').html(this.twoComputeView.render());
   }
 
 });
