@@ -124,7 +124,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('upload', function(n) {
-    grunt.task.run(['shell:scaleSite','shell:gitAdd','shell:gitCommit','shell:gitPush','shell:downScaleSite']);
+    grunt.task.run(['shell:scaleSite','shell:gitPush','shell:downScaleSite']);
   });
 
   grunt.registerTask('deploy', function(){
