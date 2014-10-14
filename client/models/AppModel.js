@@ -31,6 +31,10 @@ var AppModel = Backbone.Model.extend({
       view.$el.appendTo($('.board'));
     }, this);
 
+    this.get('operation').on('newValue', function(){
+      this.trigger('update');
+    }, this);
+
   },
 
   //Fill in initial values for a new game
@@ -52,30 +56,35 @@ var AppModel = Backbone.Model.extend({
       var one = this.get('computeQueue').at(0).getValue();
       var two = this.get('computeQueue').at(1).getValue();
       var operation = this.get('operation').getValue();
-      var result, text;
-      if(operation === '+'){
-        result = one+two;
-        text = ""+result;
-      } else if(operation === '-'){
-        result = one-two;
-        text = ""+result;      
-      } else if(operation === '*'){
-        result = one*two;
-        text = ""+result;
-      } else{
-        result = one/two;
-        if(one % two !== 0){
-          text = "" + one + "/" + two;
-        } else{
-          text = result;
-        }
-      }
+      var calculate = this.calculateValue(one, two, operation);
       this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-      this.get('numQueue').add({value: result, display: text});
+      this.get('numQueue').add({value: calculate[0], display: calculate[1]});
       this.set('numComputingValues', 0);
     } else{
       alert("Need two numbers to do a computation!")
     }
+  },
+
+  calculateValue: function(one, two, operation){
+    var text, result;
+    if(operation === '+'){
+      result = one+two;
+      text = ""+result;
+    } else if(operation === '-'){
+      result = one-two;
+      text = ""+result;      
+    } else if(operation === '*'){
+      result = one*two;
+      text = ""+result;
+    } else{
+      result = one/two;
+      if(one % two !== 0){
+        text = "" + one + "/" + two;
+      } else{
+        text = result;
+      }
+    }
+    return [result, text];
   },
 
   //Clear out computation area, move numbers back to queue

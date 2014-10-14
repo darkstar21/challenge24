@@ -18,6 +18,7 @@ var OperationModel = Backbone.Model.extend({
   	} else{
   		this.set('value', '+');
   	}
+    this.trigger('newValue');
   }
 
 });
