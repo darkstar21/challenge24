@@ -103,31 +103,6 @@ var AppModel = Backbone.Model.extend({
   },
 
   calculateValue: function(one, two, operation){
-    var toFraction =  function(number){
-      var counter = 0;
-      while(number % 1 !== 0){
-        number *= 10;
-        counter++;
-      }
-      var numerator = number;
-      var denominator = Math.pow(10,counter);
-      var divisor = gcf(numerator, denominator);
-      numerator /= divisor;
-      denominator /= divisor;
-
-      return '' + numerator + '/' + denominator;
-    };
-
-    var gcf = function(a, b){
-      var min = Math.min(a, b);
-      var max = Math.max(a, b);
-      if(min === 1 || max % min === 0){
-        return min;
-      } else{
-        return gcf(min, max % min);
-      }
-    };
-
     var text, result;
     if(operation === '+'){
       result = one+two;
@@ -139,7 +114,8 @@ var AppModel = Backbone.Model.extend({
       result = one/two;
     }
     if(result % 1 !== 0){
-      text = toFraction(result);
+      var f = new Fraction(result);
+      text = f.numerator + '/' + f.denominator;
     } else{
       text = '' + result;
     }
