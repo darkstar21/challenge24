@@ -513,7 +513,7 @@ var AppModel = Backbone.Model.extend({
   },
 
   calculateValue: function(one, two, operation){
-    var text, result;
+    var text, result, flag = false;
     if(operation === '+'){
       result = one+two;
     } else if(operation === '-'){
@@ -521,10 +521,15 @@ var AppModel = Backbone.Model.extend({
     } else if(operation === '*'){
       result = one*two;
     } else{
+      flag = true;
       result = one/two;
     }
     if(result % 1 !== 0){
-      var f = new Fraction(result);
+      if(flag){
+        var f = new Fraction(one, two);
+      } else{
+        var f = new Fraction(result);
+      }
       text = f.numerator + '/' + f.denominator;
     } else{
       text = '' + result;
