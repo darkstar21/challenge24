@@ -3,6 +3,7 @@ var ComputeModel = Backbone.Model.extend({
 		this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
 		this.set('operation', new OperationModel());
 		this.set('numComputingValues', 0);
+		this.set('answer', []);
 	},
 
 	compute: function(){
@@ -10,13 +11,11 @@ var ComputeModel = Backbone.Model.extend({
 	        var one = this.get('computeQueue').at(0).getValue();
 	        var two = this.get('computeQueue').at(1).getValue();
 	        var operation = this.get('operation').getValue();
-	        var calculate = this.calculateValue(one, two, operation);
 	        this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
 	        this.set('numComputingValues', 0);
-	        return {value: calculate[0], display: calculate[1]};
+	        this.set('answer', this.calculateValue(one, two, operation));
 	    } else{
-	        alert("Need two numbers to do a computation!")
-	        return null;
+	        alert("Need two numbers to do a computation!");
 	    }
 	},
 
