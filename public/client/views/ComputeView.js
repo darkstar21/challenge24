@@ -8,7 +8,7 @@ var ComputeView = Backbone.View.extend({
     <div class="computeTwo-area"></div>\
     <div class="equals">=</div>\
     <div class="answer-area"></div>\
-    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button><div id="timer">Timer: </div>'),
+    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button>'),
 
   events: {
     'click .submit-button': function() {
@@ -20,18 +20,33 @@ var ComputeView = Backbone.View.extend({
   },
 
   initialize: function() {
+    this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
+    this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
+    this.operationView = new OperationView({model: this.model.get('operation')});
+
+    this.model.on('change:numComputingValues', function(model) {
+      this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
+      this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
+      this.render();
+    }, this);
   
     this.render();
   },
 
   render: function(){
-    // to preserve event handlers on child nodes, we must call .detach() on them before overwriting with .html()
-    // see http://api.jquery.com/detach/
     this.$el.children().detach();
-    this.$el.html('<h3>Computation Area</h3>').append(
-      this.collection.map(function(number){
-        return new NumberView({model: number}).render();
-      })
-    );
+    this.$el.html(this.template);
+    this.$('.computeOne-area').html(this.oneComputeView.render());
+    this.$('.operation-box').html(this.operationView.el);
+    this.$('.computeTwo-area').html(this.twoComputeView.render());
+    if(this.model.get('computeQueue').at(1).getValue()){
+      var one = this.model.get('computeQueue').at(0).getValue();
+      var two = this.model.get('computeQueue').at(1).getValue();
+      var op = this.model.get('operation').getValue();
+      var calc = this.model.calculateValue(one, two, op);
+      this.$('.answer-area').text(calc[1]);
+    } else{
+      this.$('.answer-area').text('');
+    }
   }
 });
