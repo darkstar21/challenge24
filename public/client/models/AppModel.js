@@ -1,35 +1,31 @@
+//URL NEEDS TO BE CHANGED DEPENDING ON SERVER
 var AppModel = Backbone.Model.extend({
 
   initialize: function(){
+    //Set initial values
     this.resetApp();
 
-    //Moving number from queue to computation. Only allowed if computation has 0 or 1 numbers
+    //Moving number from queue to computation area. Only allowed if computation area has 0 or 1 numbers
     this.get('numQueue').on('dequeue', function(number){
-      if(this.get('numComputingValues') < 2){
+      var numComputingValues = this.get('computeModel').getNumComputingValues();
+      if(numComputingValues < 2){
         this.get('numQueue').remove(number);
-        if(this.get('numComputingValues') === 0){
-          this.get('computeQueue').reset([number, new NumberModel({})]);
-        } else {
-          this.get('computeQueue').reset([this.get('computeQueue').at(0), number]);
-        }
-        this.set('numComputingValues', this.get('numComputingValues')+1);
+        this.get('computeModel').addNum(number);
       }
     }, this);
 
-    //Moving number from computation to queue. Always allowed.
-    this.get('computeQueue').on('dequeue', function(number){
-      this.get('computeQueue').remove(number);
-      this.get('computeQueue').add(new NumberModel({}));
+    //Moving number from computation area to queue. Always allowed.
+    this.get('computeModel').on('dequeue', function(number){
       this.get('numQueue').add(number);
-      this.set('numComputingValues', this.get('numComputingValues')-1);
     }, this);
 
     this.get('numQueue').on('win', function(){
-      alert("You won! Your time was " + this.get('timer') + " seconds");
       clearInterval(myVar);
+      alert("You won! Your time was " + this.get('timer') + " seconds");
       //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
       $.ajax({
-        url: 'http://challenge24.azurewebsites.net/recordTime',
+        url: 'http://localhost:4568/recordTime',
+        //url: 'http://challenge24.azurewebsites.net/recordTime',
         type: 'POST',
         data: {
           time: this.get('timer')
@@ -41,11 +37,8 @@ var AppModel = Backbone.Model.extend({
       });
     }, this);
 
-    this.get('operation').on('newValue', function(){
-      this.trigger('update');
-    }, this);
+    //Setup timer
     var that = this;
-
     var myVar = setInterval(function(){
       that.set('timer', myTimer());
     }, 1000);
@@ -59,7 +52,6 @@ var AppModel = Backbone.Model.extend({
       document.getElementById("timer").innerHTML = 'Timer: ' + Math.floor(diff);
       return Math.floor(diff);
     }
-
   },
 
   //Fill in initial values for a new game
@@ -71,15 +63,15 @@ var AppModel = Backbone.Model.extend({
       this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
     }
     this.set('numQueue', new NumberQueue(this.get('startingNums')));
-    this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
-    this.set('operation', new OperationModel());
-    this.set('numComputingValues', 0);
+    this.set('computeModel', new ComputeModel());
     this.set('timer', 0);
     this.set('startDate', new Date());
+    
     var that = this;
     //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
     $.ajax({
-      url: 'http://challenge24.azurewebsites.net/averageTime',
+      url: 'http://localhost:4568/averageTime',
+      //url: 'http://challenge24.azurewebsites.net/averageTime',
       type: 'GET'
     }).done(function(average){
       that.set('averageTime', average);
@@ -87,75 +79,20 @@ var AppModel = Backbone.Model.extend({
     });
   },
 
-  //Compute new number only if there are 2 numbers in computation area
-  compute: function(){
-    if(this.get('computeQueue').at(1).getValue()){
-      var one = this.get('computeQueue').at(0).getValue();
-      var two = this.get('computeQueue').at(1).getValue();
-      var operation = this.get('operation').getValue();
-      var calculate = this.calculateValue(one, two, operation);
-      this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-      this.get('numQueue').add({value: calculate[0], display: calculate[1]});
-      this.set('numComputingValues', 0);
-    } else{
-      alert("Need two numbers to do a computation!")
-    }
-  },
-
-  calculateValue: function(one, two, operation){
-    var text, result, flag = false;
-    if(operation === '+'){
-      result = one+two;
-    } else if(operation === '-'){
-      result = one-two;
-    } else if(operation === '*'){
-      result = one*two;
-    } else{
-      flag = true;
-      result = one/two;
-    }
-    if(result % 1 !== 0){
-      if(flag){
-        var f = new Fraction(one, two);
-      } else{
-        var f = new Fraction(result);
-      }
-      text = f.numerator + '/' + f.denominator;
-    } else{
-      text = '' + result;
-    }
-    return [result, text];
-  },
-
-  //Clear out computation area, move numbers back to queue
-  clearComputeArea: function(){
-    this.get('computeQueue').each(function(number){
-      if(number.get('value')){
-        this.get('numQueue').add(number);
-      }
-    }, this);
-    this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-    this.set('numComputingValues', 0);
-  },
-
   //Clear computing area and set queue back to original numbers
   reset: function(){
     this.get('numQueue').reset(this.get('startingNums'));
-    this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-    this.set('numComputingValues', 0);
+    this.get('computeModel').clear();
   },
 
   generateValidNums: function(){
-    var numArray = [];
-    for(var i = 0; i < 4; i++){
-      numArray.push(Math.floor(Math.random()*13+1));
-    }
-    while(!this.isValid(numArray)){
-      numArray = [];
+    do {
+      var numArray = [];
       for(var i = 0; i < 4; i++){
         numArray.push(Math.floor(Math.random()*13+1));
       }
-    }
+    } while(!this.isValid(numArray)){
+  
     return numArray;
   },
 
