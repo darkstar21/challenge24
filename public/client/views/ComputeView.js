@@ -8,14 +8,11 @@ var ComputeView = Backbone.View.extend({
     <div class="computeTwo-area"></div>\
     <div class="equals">=</div>\
     <div class="answer-area"></div>\
-    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button>'),
+    <button class="submit-button">Submit</button>'),
 
   events: {
     'click .submit-button': function() {
       this.model.compute();
-    },
-    'click .clear-button': function() {
-      this.model.clearComputeArea();
     }
   },
 
@@ -27,6 +24,10 @@ var ComputeView = Backbone.View.extend({
     this.model.on('change:numComputingValues', function(model) {
       this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
       this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
+      this.render();
+    }, this);
+
+    this.model.on('update', function(){
       this.render();
     }, this);
   
