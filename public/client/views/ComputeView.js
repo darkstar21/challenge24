@@ -2,19 +2,25 @@ var ComputeView = Backbone.View.extend({
   
   className: 'queue',
 
+  template: _.template('<h3>Computation Area</h3>\
+    <div class="computeOne-area"></div>\
+    <div class="operation-box"></div>\
+    <div class="computeTwo-area"></div>\
+    <div class="equals">=</div>\
+    <div class="answer-area"></div>\
+    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button><div id="timer">Timer: </div>'),
+
+  events: {
+    'click .submit-button': function() {
+      this.model.compute();
+    },
+    'click .clear-button': function() {
+      this.model.clearComputeArea();
+    }
+  },
+
   initialize: function() {
-    this.collection.on('add', function(){
-      this.render();
-    }, this);
-
-    this.collection.on('remove', function(){
-      this.render();
-    }, this);
-
-    this.collection.on('reset', function(){
-      this.render();
-    }, this);
-
+  
     this.render();
   },
 
@@ -28,5 +34,4 @@ var ComputeView = Backbone.View.extend({
       })
     );
   }
-
 });
