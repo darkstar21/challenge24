@@ -19,6 +19,10 @@ var AppModel = Backbone.Model.extend({
       this.get('numQueue').add(number);
     }, this);
 
+    this.get('computeModel').on('answer', function(answer){
+      this.get('numQueue').add(new NumberModel({value: answer[0], display: answer[1]}));
+    }, this);
+
     this.get('numQueue').on('win', function(){
       clearInterval(myVar);
       alert("You won! Your time was " + this.get('timer') + " seconds");
@@ -66,7 +70,7 @@ var AppModel = Backbone.Model.extend({
     this.set('computeModel', new ComputeModel());
     this.set('timer', 0);
     this.set('startDate', new Date());
-    
+
     var that = this;
     //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
     $.ajax({
@@ -86,13 +90,14 @@ var AppModel = Backbone.Model.extend({
   },
 
   generateValidNums: function(){
+    var numArray;
     do {
-      var numArray = [];
+      numArray = [];
       for(var i = 0; i < 4; i++){
         numArray.push(Math.floor(Math.random()*13+1));
       }
-    } while(!this.isValid(numArray)){
-  
+    } while(!this.isValid(numArray))
+
     return numArray;
   },
 
@@ -165,7 +170,7 @@ var AppModel = Backbone.Model.extend({
           recurse(tempCurrent, tempRemaining);
         }
       }
-    }
+    };
     recurse([], numArray);
     return possible;
   }

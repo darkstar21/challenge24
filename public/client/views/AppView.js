@@ -27,9 +27,9 @@ var AppView = Backbone.View.extend({
     //   this.render();
     // }, this);
 
-    // this.model.on('update', function(){
-    //   this.render();
-    // }, this);
+    this.model.on('update', function(){
+      this.render();
+    }, this);
 
     this.render();
   },
@@ -40,7 +40,7 @@ var AppView = Backbone.View.extend({
     this.$('.number-queue').html(this.holderView.el);
     this.$('.computation-area').html(this.computeView.el);
     this.$('#timer').html('Timer: ' + this.model.get('timer'));
-   
+
     if(this.model.get('averageTime') !== undefined && this.model.get('averageTime') !== ''){
       this.$('.average-time').text('Average Time: ' + this.model.get('averageTime'));
     }

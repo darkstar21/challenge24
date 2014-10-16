@@ -404,42 +404,126 @@ var OperationModel = Backbone.Model.extend({
   	} else{
   		this.set('value', '+');
   	}
-    this.trigger('newValue');
   }
 
 });
+var ComputeModel = Backbone.Model.extend({
+	initialize: function(){
+		this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
+		this.set('operation', new OperationModel());
+		this.set('numComputingValues', 0);
+
+		//When there is a click on one of the two number views
+		this.get('computeQueue').on('dequeue', function(number){
+			this.get('computeQueue').remove(number);
+  		this.get('computeQueue').add(new NumberModel({}));
+  		if(this.get('numComputingValues') > 0){
+  			this.set('numComputingValues', this.get('numComputingValues')-1);
+  		}
+  		this.trigger('dequeue', number);
+		}, this);
+
+		this.get('operation').on('change:value', function(){
+      		this.trigger('update');
+    	}, this);
+	},
+
+	//Compute new number only if there are 2 numbers in computation area
+	compute: function(){
+      if(this.get('numComputingValues') === 2){
+        var one = this.get('computeQueue').at(0).getValue();
+        var two = this.get('computeQueue').at(1).getValue();
+        var operation = this.get('operation').getValue();
+        this.clear();
+        this.trigger('answer', this.calculateValue(one, two, operation));
+      } else{
+        alert("Need two numbers to do a computation!");
+      }
+	},
+
+	//Clear computation area and reset values
+	clear: function(){
+		this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
+		this.set('numComputingValues', 0);
+	},
+
+	//Takes two numbers and an operation, returns an array containing the calculated value and a nice string representation of it.
+	calculateValue: function(one, two, operation){
+		var text, result, flag = false;
+		if(operation === '+'){
+      result = one+two;
+		} else if(operation === '-'){
+      result = one-two;
+		} else if(operation === '*'){
+      result = one*two;
+		} else{
+      flag = true;
+      result = one/two;
+		}
+		if(result % 1 !== 0){
+			var f;
+      if(flag){
+      	f = new Fraction(one, two);
+      } else{
+      	f = new Fraction(result);
+      }
+			text = f.numerator + '/' + f.denominator;
+		} else{
+			text = '' + result;
+		}
+		return [result, text];
+	},
+
+	addNum: function(number){
+		if(this.get('numComputingValues') === 0){
+      this.setComputeQueue([number, new NumberModel({})]);
+    } else {
+      this.setComputeQueue([this.get('computeQueue').at(0), number]);
+    }
+	},
+
+	getNumComputingValues: function(){
+		return this.get('numComputingValues');
+	},
+
+	setComputeQueue: function(numModelArray){
+		this.get('computeQueue').reset(numModelArray);
+		this.set('numComputingValues', this.get('numComputingValues')+1);
+	}
+});
+
+//URL NEEDS TO BE CHANGED DEPENDING ON SERVER
 var AppModel = Backbone.Model.extend({
 
   initialize: function(){
+    //Set initial values
     this.resetApp();
 
-    //Moving number from queue to computation. Only allowed if computation has 0 or 1 numbers
+    //Moving number from queue to computation area. Only allowed if computation area has 0 or 1 numbers
     this.get('numQueue').on('dequeue', function(number){
-      if(this.get('numComputingValues') < 2){
+      var numComputingValues = this.get('computeModel').getNumComputingValues();
+      if(numComputingValues < 2){
         this.get('numQueue').remove(number);
-        if(this.get('numComputingValues') === 0){
-          this.get('computeQueue').reset([number, new NumberModel({})]);
-        } else {
-          this.get('computeQueue').reset([this.get('computeQueue').at(0), number]);
-        }
-        this.set('numComputingValues', this.get('numComputingValues')+1);
+        this.get('computeModel').addNum(number);
       }
     }, this);
 
-    //Moving number from computation to queue. Always allowed.
-    this.get('computeQueue').on('dequeue', function(number){
-      this.get('computeQueue').remove(number);
-      this.get('computeQueue').add(new NumberModel({}));
+    //Moving number from computation area to queue. Always allowed.
+    this.get('computeModel').on('dequeue', function(number){
       this.get('numQueue').add(number);
-      this.set('numComputingValues', this.get('numComputingValues')-1);
+    }, this);
+
+    this.get('computeModel').on('answer', function(answer){
+      this.get('numQueue').add(new NumberModel({value: answer[0], display: answer[1]}));
     }, this);
 
     this.get('numQueue').on('win', function(){
-      alert("You won! Your time was " + this.get('timer') + " seconds");
       clearInterval(myVar);
+      alert("You won! Your time was " + this.get('timer') + " seconds");
       //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
       $.ajax({
-        url: 'http://challenge24.azurewebsites.net/recordTime',
+        url: 'http://localhost:4568/recordTime',
+        //url: 'http://challenge24.azurewebsites.net/recordTime',
         type: 'POST',
         data: {
           time: this.get('timer')
@@ -451,11 +535,8 @@ var AppModel = Backbone.Model.extend({
       });
     }, this);
 
-    this.get('operation').on('newValue', function(){
-      this.trigger('update');
-    }, this);
+    //Setup timer
     var that = this;
-
     var myVar = setInterval(function(){
       that.set('timer', myTimer());
     }, 1000);
@@ -469,7 +550,6 @@ var AppModel = Backbone.Model.extend({
       document.getElementById("timer").innerHTML = 'Timer: ' + Math.floor(diff);
       return Math.floor(diff);
     }
-
   },
 
   //Fill in initial values for a new game
@@ -481,15 +561,15 @@ var AppModel = Backbone.Model.extend({
       this.get('startingNums').push(new NumberModel({value: numArray[i], display: ""+numArray[i]}));
     }
     this.set('numQueue', new NumberQueue(this.get('startingNums')));
-    this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
-    this.set('operation', new OperationModel());
-    this.set('numComputingValues', 0);
+    this.set('computeModel', new ComputeModel());
     this.set('timer', 0);
     this.set('startDate', new Date());
+
     var that = this;
     //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
     $.ajax({
-      url: 'http://challenge24.azurewebsites.net/averageTime',
+      url: 'http://localhost:4568/averageTime',
+      //url: 'http://challenge24.azurewebsites.net/averageTime',
       type: 'GET'
     }).done(function(average){
       that.set('averageTime', average);
@@ -497,75 +577,21 @@ var AppModel = Backbone.Model.extend({
     });
   },
 
-  //Compute new number only if there are 2 numbers in computation area
-  compute: function(){
-    if(this.get('computeQueue').at(1).getValue()){
-      var one = this.get('computeQueue').at(0).getValue();
-      var two = this.get('computeQueue').at(1).getValue();
-      var operation = this.get('operation').getValue();
-      var calculate = this.calculateValue(one, two, operation);
-      this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-      this.get('numQueue').add({value: calculate[0], display: calculate[1]});
-      this.set('numComputingValues', 0);
-    } else{
-      alert("Need two numbers to do a computation!")
-    }
-  },
-
-  calculateValue: function(one, two, operation){
-    var text, result, flag = false;
-    if(operation === '+'){
-      result = one+two;
-    } else if(operation === '-'){
-      result = one-two;
-    } else if(operation === '*'){
-      result = one*two;
-    } else{
-      flag = true;
-      result = one/two;
-    }
-    if(result % 1 !== 0){
-      if(flag){
-        var f = new Fraction(one, two);
-      } else{
-        var f = new Fraction(result);
-      }
-      text = f.numerator + '/' + f.denominator;
-    } else{
-      text = '' + result;
-    }
-    return [result, text];
-  },
-
-  //Clear out computation area, move numbers back to queue
-  clearComputeArea: function(){
-    this.get('computeQueue').each(function(number){
-      if(number.get('value')){
-        this.get('numQueue').add(number);
-      }
-    }, this);
-    this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-    this.set('numComputingValues', 0);
-  },
-
   //Clear computing area and set queue back to original numbers
   reset: function(){
     this.get('numQueue').reset(this.get('startingNums'));
-    this.get('computeQueue').reset([new NumberModel({}), new NumberModel({})]);
-    this.set('numComputingValues', 0);
+    this.get('computeModel').clear();
   },
 
   generateValidNums: function(){
-    var numArray = [];
-    for(var i = 0; i < 4; i++){
-      numArray.push(Math.floor(Math.random()*13+1));
-    }
-    while(!this.isValid(numArray)){
+    var numArray;
+    do {
       numArray = [];
       for(var i = 0; i < 4; i++){
         numArray.push(Math.floor(Math.random()*13+1));
       }
-    }
+    } while(!this.isValid(numArray))
+
     return numArray;
   },
 
@@ -638,7 +664,7 @@ var AppModel = Backbone.Model.extend({
           recurse(tempCurrent, tempRemaining);
         }
       }
-    }
+    };
     recurse([], numArray);
     return possible;
   }
@@ -758,66 +784,21 @@ var ComputeView = Backbone.View.extend({
   
   className: 'queue',
 
-  initialize: function() {
-    this.collection.on('add', function(){
-      this.render();
-    }, this);
-
-    this.collection.on('remove', function(){
-      this.render();
-    }, this);
-
-    this.collection.on('reset', function(){
-      this.render();
-    }, this);
-
-    this.render();
-  },
-
-  render: function(){
-    // to preserve event handlers on child nodes, we must call .detach() on them before overwriting with .html()
-    // see http://api.jquery.com/detach/
-    this.$el.children().detach();
-    this.$el.html('<h3>Computation Area</h3>').append(
-      this.collection.map(function(number){
-        return new NumberView({model: number}).render();
-      })
-    );
-  }
-
-});
-var AppView = Backbone.View.extend({
-
-  template: _.template('<button class="reset-button">Reset</button> <button class="hint-button">Hint</button>\
-    <a href="/logout" class="logout">Logout</a>\
-    <div class="average-time">Average Time: </div>\
-    <div class="number-queue"></div>\
-    <h3>Computation Area</h3>\
+  template: _.template('<h3>Computation Area</h3>\
     <div class="computeOne-area"></div>\
     <div class="operation-box"></div>\
     <div class="computeTwo-area"></div>\
     <div class="equals">=</div>\
     <div class="answer-area"></div>\
-    <button class="submit-button">Submit</button> <button class="clear-button">Clear</button><div id="timer">Timer: </div>\
-    <div class="hint-area"></div>'),
+    <button class="submit-button">Submit</button>'),
 
   events: {
-    'click .reset-button': function(){
-      this.model.reset();
-    },
-    'click .hint-button': function(){
-      this.$('.hint-area').html('Hint: ' + this.model.get('hint'));
-    },
     'click .submit-button': function() {
       this.model.compute();
-    },
-    'click .clear-button': function() {
-      this.model.clearComputeArea();
-    },
+    }
   },
 
-  initialize: function(params){
-    this.holderView = new NumberQueueView({collection: this.model.get('numQueue')});
+  initialize: function() {
     this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
     this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
     this.operationView = new OperationView({model: this.model.get('operation')});
@@ -831,19 +812,16 @@ var AppView = Backbone.View.extend({
     this.model.on('update', function(){
       this.render();
     }, this);
-
+  
     this.render();
   },
 
   render: function(){
-
     this.$el.children().detach();
     this.$el.html(this.template);
-    this.$('.number-queue').html(this.holderView.el);
     this.$('.computeOne-area').html(this.oneComputeView.render());
     this.$('.operation-box').html(this.operationView.el);
     this.$('.computeTwo-area').html(this.twoComputeView.render());
-    this.$('#timer').html('Timer: ' + this.model.get('timer'));
     if(this.model.get('computeQueue').at(1).getValue()){
       var one = this.model.get('computeQueue').at(0).getValue();
       var two = this.model.get('computeQueue').at(1).getValue();
@@ -853,6 +831,52 @@ var AppView = Backbone.View.extend({
     } else{
       this.$('.answer-area').text('');
     }
+  }
+});
+
+var AppView = Backbone.View.extend({
+
+  template: _.template('<button class="reset-button">Reset</button> <button class="hint-button">Hint</button>\
+    <a href="/logout" class="logout">Logout</a>\
+    <div class="average-time">Average Time: </div>\
+    <div class="number-queue"></div>\
+    <div class="computation-area"></div>\
+    <div id="timer">Timer: </div>\
+    <div class="hint-area"></div>'),
+
+  events: {
+    'click .reset-button': function(){
+      this.model.reset();
+    },
+    'click .hint-button': function(){
+      this.$('.hint-area').html('Hint: ' + this.model.get('hint'));
+    }
+  },
+
+  initialize: function(params){
+    this.holderView = new NumberQueueView({collection: this.model.get('numQueue')});
+    this.computeView = new ComputeView({model: this.model.get('computeModel')});
+
+    // this.model.on('change:numComputingValues', function(model) {
+    //   this.oneComputeView = new NumberView({model: this.model.get('computeQueue').at(0)});
+    //   this.twoComputeView = new NumberView({model: this.model.get('computeQueue').at(1)});
+    //   this.render();
+    // }, this);
+
+    this.model.on('update', function(){
+      this.render();
+    }, this);
+
+    this.render();
+  },
+
+  render: function(){
+    this.$el.children().detach();
+    this.$el.html(this.template);
+    this.$('.number-queue').html(this.holderView.el);
+    this.$('.computation-area').html(this.computeView.el);
+    this.$('#timer').html('Timer: ' + this.model.get('timer'));
+
     if(this.model.get('averageTime') !== undefined && this.model.get('averageTime') !== ''){
       this.$('.average-time').text('Average Time: ' + this.model.get('averageTime'));
     }

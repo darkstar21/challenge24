@@ -3,15 +3,15 @@ var ComputeModel = Backbone.Model.extend({
 		this.set('computeQueue', new ComputeQueue([new NumberModel({}), new NumberModel({})]));
 		this.set('operation', new OperationModel());
 		this.set('numComputingValues', 0);
-		this.set('answer', []);
 
 		//When there is a click on one of the two number views
 		this.get('computeQueue').on('dequeue', function(number){
 			this.get('computeQueue').remove(number);
-      		this.get('computeQueue').add(new NumberModel({}));
-      		if(this.get('numComputingValues') > 0){
-      			this.set('numComputingValues', this.get('numComputingValues')-1);
-      		}
+  		this.get('computeQueue').add(new NumberModel({}));
+  		if(this.get('numComputingValues') > 0){
+  			this.set('numComputingValues', this.get('numComputingValues')-1);
+  		}
+  		this.trigger('dequeue', number);
 		}, this);
 
 		this.get('operation').on('change:value', function(){
@@ -21,15 +21,15 @@ var ComputeModel = Backbone.Model.extend({
 
 	//Compute new number only if there are 2 numbers in computation area
 	compute: function(){
-	    if(this.get('numComputingValues') == 2){
-	        var one = this.get('computeQueue').at(0).getValue();
-	        var two = this.get('computeQueue').at(1).getValue();
-	        var operation = this.get('operation').getValue();
-	        this.clear();
-	        this.set('answer', this.calculateValue(one, two, operation));
-	    } else{
-	        alert("Need two numbers to do a computation!");
-	    }
+      if(this.get('numComputingValues') === 2){
+        var one = this.get('computeQueue').at(0).getValue();
+        var two = this.get('computeQueue').at(1).getValue();
+        var operation = this.get('operation').getValue();
+        this.clear();
+        this.trigger('answer', this.calculateValue(one, two, operation));
+      } else{
+        alert("Need two numbers to do a computation!");
+      }
 	},
 
 	//Clear computation area and reset values
@@ -42,21 +42,22 @@ var ComputeModel = Backbone.Model.extend({
 	calculateValue: function(one, two, operation){
 		var text, result, flag = false;
 		if(operation === '+'){
-		    result = one+two;
+      result = one+two;
 		} else if(operation === '-'){
-		    result = one-two;
+      result = one-two;
 		} else if(operation === '*'){
-		    result = one*two;
+      result = one*two;
 		} else{
-		    flag = true;
-		    result = one/two;
+      flag = true;
+      result = one/two;
 		}
 		if(result % 1 !== 0){
-		    if(flag){
-		    	var f = new Fraction(one, two);
-		    } else{
-		    	var f = new Fraction(result);
-		    }
+			var f;
+      if(flag){
+      	f = new Fraction(one, two);
+      } else{
+      	f = new Fraction(result);
+      }
 			text = f.numerator + '/' + f.denominator;
 		} else{
 			text = '' + result;
@@ -66,10 +67,10 @@ var ComputeModel = Backbone.Model.extend({
 
 	addNum: function(number){
 		if(this.get('numComputingValues') === 0){
-          this.setComputeQueue([number, new NumberModel({})]);
-        } else {
-          this.setComputeQueue([this.get('computeQueue').at(0), number]);
-        }
+      this.setComputeQueue([number, new NumberModel({})]);
+    } else {
+      this.setComputeQueue([this.get('computeQueue').at(0), number]);
+    }
 	},
 
 	getNumComputingValues: function(){

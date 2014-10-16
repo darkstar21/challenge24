@@ -5,10 +5,10 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: ['public/client/fraction.js','public/client/models/NumberModel.js', 'public/client/models/OperationModel.js',
-        'public/client/models/AppModel.js','public/client/collections/Numbers.js', 'public/client/collections/NumberQueue.js',
-        'public/client/collections/ComputeQueue.js','public/client/views/NumberView.js', 'public/client/views/OperationView.js',
-        'public/client/views/NumberQueueView.js', 'public/client/views/ComputeView.js', 'public/client/views/AppView.js',
-        'public/client/main.js'],
+        'public/client/models/ComputeModel.js', 'public/client/models/AppModel.js', 'public/client/collections/Numbers.js',
+        'public/client/collections/NumberQueue.js', 'public/client/collections/ComputeQueue.js','public/client/views/NumberView.js',
+        'public/client/views/OperationView.js', 'public/client/views/NumberQueueView.js', 'public/client/views/ComputeView.js',
+        'public/client/views/AppView.js', 'public/client/main.js'],
         dest: 'public/dist/built.js',
       },
     },
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
 
     jshint: {
       files: {
-        src: ['app/**/*.js']
+        src: ['app/**/*.js', 'public/client/**/*.js']
         // Add filespec list here
       },
       options: {
@@ -117,10 +117,10 @@ module.exports = function(grunt) {
   ////////////////////////////////////////////////////
 
   grunt.registerTask('build', [
+    'jshint',
     'concat',
     'uglify',
-    'cssmin',
-    'jshint'
+    'cssmin'
   ]);
 
   grunt.registerTask('upload', function(n) {
