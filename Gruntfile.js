@@ -84,7 +84,7 @@ module.exports = function(grunt) {
         command: "git commit"
       },
       gitPush: {
-        command: "git push azure2 master"
+        command: "git push azure master"
       },
       downScaleSite: {
         command:"azure site scale mode free challenge24"

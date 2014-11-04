@@ -28,8 +28,8 @@ var AppModel = Backbone.Model.extend({
       alert("You won! Your time was " + this.get('timer') + " seconds");
       //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
       $.ajax({
-        url: 'http://localhost:4568/recordTime',
-        //url: 'http://challenge24.azurewebsites.net/recordTime',
+        // url: 'http://localhost:4568/recordTime',
+        url: 'http://challenge24.azurewebsites.net/recordTime',
         type: 'POST',
         data: {
           time: this.get('timer')
@@ -74,8 +74,8 @@ var AppModel = Backbone.Model.extend({
     var that = this;
     //URL NEEDS TO BE CHANGED DEPENDING ON SERVER
     $.ajax({
-      url: 'http://localhost:4568/averageTime',
-      //url: 'http://challenge24.azurewebsites.net/averageTime',
+      // url: 'http://localhost:4568/averageTime',
+      url: 'http://challenge24.azurewebsites.net/averageTime',
       type: 'GET'
     }).done(function(average){
       that.set('averageTime', average);
